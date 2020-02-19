@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="有监督参数估计是指已知分类器结构或函数形式，从训练样本中估计参数。    本文主要介绍贝叶斯决策（详见贝叶斯决策的过程）条件概率密度的有监督参数估计过程。方法有最大似然估计和贝叶斯参数估计法。">
+<meta name="keywords" content="模式识别">
+<meta property="og:type" content="article">
+<meta property="og:title" content="贝叶斯决策类条件概率密度估计：最大似然和贝叶斯参数估计">
+<meta property="og:url" content="http://anery.github.io/posts/86fca59a.html">
+<meta property="og:site_name" content="ymmy">
+<meta property="og:description" content="有监督参数估计是指已知分类器结构或函数形式，从训练样本中估计参数。    本文主要介绍贝叶斯决策（详见贝叶斯决策的过程）条件概率密度的有监督参数估计过程。方法有最大似然估计和贝叶斯参数估计法。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145720.png#pic_center">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145842.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130150200.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145900.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145906.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145911.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145917.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145922.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145928.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145937.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145944.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145949.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145954.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130150032.png">
+<meta property="og:updated_time" content="2020-01-30T12:22:02.873Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="贝叶斯决策类条件概率密度估计：最大似然和贝叶斯参数估计">
+<meta name="twitter:description" content="有监督参数估计是指已知分类器结构或函数形式，从训练样本中估计参数。    本文主要介绍贝叶斯决策（详见贝叶斯决策的过程）条件概率密度的有监督参数估计过程。方法有最大似然估计和贝叶斯参数估计法。">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145720.png#pic_center">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="ymmy" type="application/atom+xml">
+
+
+
+  
+  
+  <link rel="canonical" href="http://anery.github.io/posts/86fca59a">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>贝叶斯决策类条件概率密度估计：最大似然和贝叶斯参数估计 | ymmy</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ymmy</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://anery.github.io/posts/86fca59a.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yue Yuan">
+      <meta itemprop="description" content="Take it easy">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ymmy">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">贝叶斯决策类条件概率密度估计：最大似然和贝叶斯参数估计
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-01-27 20:26:50" itemprop="dateCreated datePublished" datetime="2020-01-27T20:26:50+08:00">2020-01-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-01-30 20:22:02" itemprop="dateModified" datetime="2020-01-30T20:22:02+08:00">2020-01-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/模式识别/" itemprop="url" rel="index"><span itemprop="name">模式识别</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/posts/86fca59a.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/posts/86fca59a.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+           
+          
+            <span id="/posts/86fca59a.html" class="leancloud_visitors" data-flag-title="贝叶斯决策类条件概率密度估计：最大似然和贝叶斯参数估计">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+		  
+		  
+            <div class="post-wordcount">
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计</span>
+                
+                <span title="字数统计">
+                  2,169 字
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长</span>
+                
+                <span title="阅读时长">
+                  8
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>有监督参数估计是指已知分类器结构或函数形式，从训练样本中估计参数。</strong>   </p>
+<p>本文主要介绍贝叶斯决策（详见<a href="https://anery.github.io/posts/296fd81e.html">贝叶斯决策的过程</a>）条件概率密度的有监督参数估计过程。方法有最大似然估计和贝叶斯参数估计法。</p>
+<a id="more"></a>
+<h1 id="最大似然估计" class="heading-control"><a href="#最大似然估计" class="headerlink" title="最大似然估计"></a>最大似然估计<a class="heading-anchor" href="#最大似然估计" aria-hidden="true"></a></h1><h2 id="假设参数为确定值，根据似然度最大进行最优估计。" class="heading-control"><a href="#假设参数为确定值，根据似然度最大进行最优估计。" class="headerlink" title="假设参数为确定值，根据似然度最大进行最优估计。"></a>假设参数为确定值，根据似然度最大进行最优估计。<a class="heading-anchor" href="#假设参数为确定值，根据似然度最大进行最优估计。" aria-hidden="true"></a></h2><p>给定数据</p>
+<script type="math/tex; mode=display">D_1,D_2...D_c</script><p>表示不同类别的样本。假设每类样本独立同分布（i.i.d. 万年不变的假设），用$D_i$来估计$θ_i$，即对每个类求一个判别函数，用该类的样本来估计判别函数的参数。</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145720.png#pic_center" alt> </p>
+<p>注意区分特征空间和参数空间。参数估计的任务是得到$p(x|w_i)$的形式，是在参数空间进行的。不妨设特征空间为d维，参数空间p维。<br>为了估计参数，需要如下几个步骤：</p>
+<ul>
+<li><p>求似然（Likelihood）<script type="math/tex">p(D|θ) =\prod_{k=1}^{n}p(x_k|θ)</script>  注意，上面这个式子针对的已经是具体的类别$w_i$了，不要问$w$参数去哪了。另外，这里的n代表样本数目，要和前面的类别数目c区分开。这个式子很好理解，即出现我们当前观测到的样本概率，求使它最大化的参数即可。</p>
+</li>
+<li><p>最大化似然 <script type="math/tex">\max_θp(D|θ)→\bigtriangledown_{\theta}p(D|θ)=0</script><br>这个梯度是在p维参数空间求解，即 </p>
+<script type="math/tex; mode=display">
+\bigtriangledown_{\theta}p=
+\begin{bmatrix}
+\frac{\partial}{\partialθ_1}\\
+...\\
+...\\
+\frac{\partial}{\partialθ_p}
+\end{bmatrix}</script></li>
+<li><p>求解梯度。可求解析解或梯度下降。（常用Log-Likelihood，易求解）</p>
+</li>
+</ul>
+<p>  <img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145842.png" alt></p>
+<p>  <img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130150200.png" alt></p>
+<p>  当先验$P(\theta)$都相等时等同于最大后验概率（MAP）决策。</p>
+<h2 id="高斯密度最大似然估计" class="heading-control"><a href="#高斯密度最大似然估计" class="headerlink" title="高斯密度最大似然估计"></a>高斯密度最大似然估计<a class="heading-anchor" href="#高斯密度最大似然估计" aria-hidden="true"></a></h2><p>以<a href="https://anery.github.io/posts/296fd81e.html">贝叶斯决策过程</a>里给出的高斯密度假设为例，对它进行最大似然参数估计。首先假设$\sigma$已知，对$\mu$进行估计。</p>
+<p>单点情况：</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145900.png" alt></p>
+<p>对于所有样本：</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145906.png" alt></p>
+<p>估计值即为观测样本均值。</p>
+<p>再来看$\mu$和$\sigma$都未知的情况。设数据服从一维高斯分布，$\theta_1=\mu$，$\theta_2=\sigma^2$:</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145911.png" alt></p>
+<p>令梯度等于0可求得：</p>
+<script type="math/tex; mode=display">\hat{μ}=\frac{1}{n}\sum_{k=1}^nx_k</script><script type="math/tex; mode=display">\hat{σ}^2=\frac1{n}\sum_{k=1}^n(x_k-\hat{μ})^2</script><p>多维情况，$\theta_2=\Sigma$：</p>
+<script type="math/tex; mode=display">\hat{μ}=\frac{1}{n}\sum_{k=1}^nx_k</script><script type="math/tex; mode=display">\hat{\Sigma}=\frac1{n}\sum_{k=1}^n(x_k-\hat{μ})(x_k-\hat{μ})^T</script><p>估计结果类似无偏估计。</p>
+<h1 id="贝叶斯参数估计" class="heading-control"><a href="#贝叶斯参数估计" class="headerlink" title="贝叶斯参数估计"></a>贝叶斯参数估计<a class="heading-anchor" href="#贝叶斯参数估计" aria-hidden="true"></a></h1><h2 id="参数被视为随机变量，估计其后验分布" class="heading-control"><a href="#参数被视为随机变量，估计其后验分布" class="headerlink" title="参数被视为随机变量，估计其后验分布"></a>参数被视为随机变量，估计其后验分布<a class="heading-anchor" href="#参数被视为随机变量，估计其后验分布" aria-hidden="true"></a></h2><p>我们先来简化一下贝叶斯决策的条件概率密度形式。考虑训练样本对分类决策的影响，后验概率可写作：</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145917.png" alt></p>
+<p>首先由于先验概率一般可以事先得到，因此通常不考虑样本对它的影响。其次，我们使用的是有监督学习，训练样本自然都会分到各自所属的类中。基于这两点可简化公式，得到<strong>公式一</strong>：</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145922.png" alt></p>
+<p>由此我们需处理的其实是c个独立的问题，那么条件概率密度可简写成c个$P(x|D)$，分别对它们进行估计。</p>
+<p>下面引出参数分布估计的过程。假定参数形式已知，即已知$p(x|θ)$，为求$p(x|D)$:</p>
+<script type="math/tex; mode=display">p(x|D)=\int{p(x,θ|D)}dθ \\  \qquad\qquad \qquad=\int{p(x|θ,D)p(θ|D)dθ}</script><p>由于测试样本x（观测样本）和训练样本D的选取是独立的，因此可写成<strong>公式二</strong>：</p>
+<script type="math/tex; mode=display">\quad p(x|D)=\int{p(x|θ)p(θ|D)dθ}</script><p>样本独立性是《模式分类第二版》里对这步变换做出的解释。对这一部分说一下我的理解。按书里说的x与D相互独立，那p(x|D)其实直接就可以简写成p(x)，且$p(\theta)$也假定已知（后面会说），直接</p>
+<script type="math/tex; mode=display">\quad p(x)=\int{p(x|θ)p(θ)dθ}</script><p>不就能求了，为什么非要对条件概率密度引入D呢？</p>
+<p>其实这样做的目的就是为了<strong>强行引入</strong>$p(\theta|D)$。别忘了$p(x|D)$实际上是$p(x|\omega,D)$，来自<strong>公式一</strong>。回顾一下公式一引入D的原因，是<strong>尽可能地利用已有的全部信息来估计后验概率$p(\omega|x)$</strong>，对$p(x|D)$也是这样。即便训练样本对观测值x没有影响，但我们希望再引入一个受样本影响的reproducing density $p(\theta|D)$，让它影响类条件概率的分布。其实相当于重新构造了一个先验，并希望$p(\theta|D)$在$\theta$的真实值附近有显著的尖峰（sharp）。通常可以用这个sharp逼近的$\hat\theta$来替代真实值，有$p(x|D) ≈ p(x|\hat\theta)$。如果估计值的置信度不高（用高斯分布来说即方差较大，sharp不明显。后面会说），也可以按$p(\theta|D)$对$\theta$进行采样，带入$p(x|\theta)$求平均：</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145928.png" alt></p>
+<p>总结一下，<strong>公式一</strong>和<strong>公式二</strong>是贝叶斯决策和参数估计的两个核心部分。尤其是<strong>公式二</strong>，我们希望把$p(x|D)$和$p(θ|D)$联系起来，那么已有的训练样本就能通过$p(θ|D)$对$p(x|D)$施加影响。<strong>至此我们已经把有监督学习问题（原始分类问题）转换成了一个无监督的概率密度预测问题（估计$p(θ|D)$）</strong>。</p>
+<h2 id="高斯密度贝叶斯估计" class="heading-control"><a href="#高斯密度贝叶斯估计" class="headerlink" title="高斯密度贝叶斯估计"></a>高斯密度贝叶斯估计<a class="heading-anchor" href="#高斯密度贝叶斯估计" aria-hidden="true"></a></h2><p>对高斯密度假设进行贝叶斯参数估计。</p>
+<p>考虑一维情况。$p(x|\mu)\sim N(μ，σ^2)$，假设$σ^2$已知，为了预测$p(μ|D)$，写成：</p>
+<script type="math/tex; mode=display">p(μ|D)=\frac{p(D|μ)p(μ)}{\int{p(D|μ)p(μ)dμ}}</script><p>由于$p(D|\mu)=\prod_{k=1}^np(x_k|μ)$，则</p>
+<script type="math/tex; mode=display">p(μ|D)=\alpha\prod_{k=1}^np(x_k|μ)p(μ)</script><p>$\alpha$是原式分母，作为常数项。</p>
+<p>假设$p(μ)\sim N(μ_0，σ_0^2)$，$\mu_0$和$\sigma_0^2$已知。可以把$\mu_0$看作对$\mu$的先验估计，$\sigma_0^2$看作估计的不确定程度。做正态分布假设只是为了简化后面的数学运算。这一步的重点在于<strong>在参数估计过程中我们是已知参数先验概率密度$p(\mu)$的。</strong></p>
+<p>公式展开：</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145937.png" alt></p>
+<p>与μ无关的因子都被归入$\alpha$中。可见$p(μ|D)$仍符合高斯分布，对照标准形式<script type="math/tex">p(μ|D)=\frac{1}{\sqrt{2\pi}σ_n}exp(-\frac{1}{2}\frac{(\mu-μ_n)^2}{σ_n^2})</script>可得</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145944.png" alt></p>
+<p>到目前为止，已经把先验知识$p(\mu)$和训练样本信息$\hat\mu_n$结合在一起，估计出了后验概率$p(\mu|D)$。把结果直观地写在一起：</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145949.png" alt></p>
+<p>在这个结果中，$\mu_n$表示在观测到n个样本后，对参数$\mu$真实值的最好估计，$\sigma_n^2$则代表这个估计的不确定性（前面对先验假设也是这么解释的，理解一下高斯分布对参数估计的理论意义）。$\sigma_n^2$随着n的增大而减小，即增加训练样本后，对$\mu$真实估计的置信度将逐渐提高，呈现一个<strong>sharp</strong>。这样的过程称为贝叶斯学习过程。</p>
+<p>将$p(\mu|D)$代入</p>
+<script type="math/tex; mode=display">p(x|D)=\int{p(x|μ)p(μ|D)dμ}</script><p>得出$p(x|D)\sim{N(μ_n，σ^2+σ_n^2)}$。因此，根据已知的$p(x|μ)\sim{N(μ，σ^2)}$，只要用$μ_n$替换μ，$σ^2+σ_n^2$替换$σ^2$即可完成参数估计。</p>
+<p>我们观察到，当n趋于无穷时，贝叶斯参数估计与最大似然效果相同。（当然在实际问题当中样本往往是有限的，这里只是形式化地理解）</p>
+<p>总结一下贝叶斯估计的一般过程：</p>
+<p>  <img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130145954.png" alt></p>
+<h1 id="最大似然和贝叶斯估计的比较" class="heading-control"><a href="#最大似然和贝叶斯估计的比较" class="headerlink" title="最大似然和贝叶斯估计的比较"></a>最大似然和贝叶斯估计的比较<a class="heading-anchor" href="#最大似然和贝叶斯估计的比较" aria-hidden="true"></a></h1><p>在上面的例子中，用贝叶斯参数估计与ML分别对条件概率密度$p(x|\omega)$进行估计，得到的虽然都是高斯分布形式，但这个过程中做的假设是完全不同的。ML直接假定$p(x|\omega)$符合高斯分布，根据训练样本选取确定的参数$\hat\mu$和$\hat\sigma^2$。而贝叶斯估计方法是通过假设已知$p(x|θ)$和$p(\mu)$符合高斯分布，推出$p(\mu|D)$符合高斯分布， 进而根据<strong>公式二</strong>推出$p(x|D)$符合高斯分布。这个分布的sharp作为估计的均值，随样本数增加而改变，且确信度逐渐升高。</p>
+<p>高斯分布的例子相对来说有点抽象，《模式分类》里还给了一个简单的例子，比较好理解，尤其是这幅图：</p>
+<p><img src="https://raw.githubusercontent.com/Anery/MyBlogPics/master/20200130150032.png" alt></p>
+<p>非常有助于理解。贝叶斯估计在样本最大值之外还有一个拖尾，这就是考虑了先验$p(\theta)$的结果，告诉我们在x=10附近，条件概率密度仍可能不为0。<em>（详见书中例1 递归的贝叶斯学习）</em></p>
+<p>总的来说，最大似然估计根据训练样本明确估计出最优参数值，而贝叶斯估计目标是求出参数的分布，类似于“参数为0.5的概率为0.8”。虽然在估计时模糊的结果（即近似正确）往往更有用，但贝叶斯估计计算复杂度较高，可理解性较差，因此最大似然估计应用更广泛。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>万一有人想不开就点了呢(๑ಠᴗಠ๑)</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wx.jpg" alt="Yue Yuan 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/zfb.jpg" alt="Yue Yuan 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yue Yuan</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://anery.github.io/posts/86fca59a.html" title="贝叶斯决策类条件概率密度估计：最大似然和贝叶斯参数估计">http://anery.github.io/posts/86fca59a.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/模式识别/" rel="tag"># 模式识别</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/48f17f8a.html" rel="next" title="深度神经网络排错实践指南">
+                <i class="fa fa-chevron-left"></i> 深度神经网络排错实践指南
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/posts/7631c563.html" rel="prev" title="谱聚类基本方法详解">
+                谱聚类基本方法详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MzQ4MS8yMDAyMQ=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="Yue Yuan">
+            
+              <p class="site-author-name" itemprop="name">Yue Yuan</p>
+              <div class="site-description motion-element" itemprop="description">Take it easy</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/Anery" title="GitHub &rarr; https://github.com/Anery" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:yy137743057@gmail.com" title="E-Mail &rarr; mailto:yy137743057@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://blog.csdn.net/shunaoxi2313" title="CSDN &rarr; https://blog.csdn.net/shunaoxi2313" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>CSDN</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://www.zhihu.com/people/fu-jian-qing-kuang" title="知乎 &rarr; https://www.zhihu.com/people/fu-jian-qing-kuang" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>知乎</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#最大似然估计"><span class="nav-number">1.</span> <span class="nav-text">最大似然估计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#假设参数为确定值，根据似然度最大进行最优估计。"><span class="nav-number">1.1.</span> <span class="nav-text">假设参数为确定值，根据似然度最大进行最优估计。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#高斯密度最大似然估计"><span class="nav-number">1.2.</span> <span class="nav-text">高斯密度最大似然估计</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#贝叶斯参数估计"><span class="nav-number">2.</span> <span class="nav-text">贝叶斯参数估计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#参数被视为随机变量，估计其后验分布"><span class="nav-number">2.1.</span> <span class="nav-text">参数被视为随机变量，估计其后验分布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#高斯密度贝叶斯估计"><span class="nav-number">2.2.</span> <span class="nav-text">高斯密度贝叶斯估计</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最大似然和贝叶斯估计的比较"><span class="nav-number">3.</span> <span class="nav-text">最大似然和贝叶斯估计的比较</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+	  
+	  
+	    
+
+		
+		<script type="text/javascript" charset="utf-8" src="/js/tagcloud.js"></script>
+		<script type="text/javascript" charset="utf-8" src="/js/tagcanvas.js"></script>
+		<div class="widget-wrap">
+			<h3 class="widget-title">Tag Cloud</h3>
+			<div id="myCanvasContainer" class="widget tagcloud">
+				<canvas width="250" height="250" id="resCanvas" style="width=100%">
+					<ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Graph/">Graph</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NLP/">NLP</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pytorch/">pytorch</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/技巧/">技巧</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/模式识别/">模式识别</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/用法记录/">用法记录</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/知识图谱/">知识图谱</a><span class="tag-list-count">1</span></li></ul>
+				</canvas>
+			</div>
+		</div>
+		
+		
+		 <div style>
+  <canvas id="canvas" style="width:60%;">当前浏览器不支持canvas，请更换浏览器后再试</canvas>
+</div>
+<script>
+(function(){
+
+   var digit=
+    [
+        [
+            [0,0,1,1,1,0,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,0,1,1,0],
+            [0,0,1,1,1,0,0]
+        ],//0
+        [
+            [0,0,0,1,1,0,0],
+            [0,1,1,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [1,1,1,1,1,1,1]
+        ],//1
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,1,1],
+            [1,1,1,1,1,1,1]
+        ],//2
+        [
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//3
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,0],
+            [0,0,1,1,1,1,0],
+            [0,1,1,0,1,1,0],
+            [1,1,0,0,1,1,0],
+            [1,1,1,1,1,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,1,1]
+        ],//4
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,1,1,1,1,0],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//5
+        [
+            [0,0,0,0,1,1,0],
+            [0,0,1,1,0,0,0],
+            [0,1,1,0,0,0,0],
+            [1,1,0,0,0,0,0],
+            [1,1,0,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//6
+        [
+            [1,1,1,1,1,1,1],
+            [1,1,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,0,0,1,1,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0],
+            [0,0,1,1,0,0,0]
+        ],//7
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,1,1,0]
+        ],//8
+        [
+            [0,1,1,1,1,1,0],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [1,1,0,0,0,1,1],
+            [0,1,1,1,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,0,1,1],
+            [0,0,0,0,1,1,0],
+            [0,0,0,1,1,0,0],
+            [0,1,1,0,0,0,0]
+        ],//9
+        [
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,1,1,1,0,0],
+            [0,0,0,0,0,0,0]
+        ]//:
+    ];
+
+var canvas = document.getElementById('canvas');
+
+if(canvas.getContext){
+    var cxt = canvas.getContext('2d');
+    //声明canvas的宽高
+    var H = 100,W = 700;
+    canvas.height = H;
+    canvas.width = W;
+    cxt.fillStyle = '#f00';
+    cxt.fillRect(10,10,50,50);
+
+    //存储时间数据
+    var data = [];
+    //存储运动的小球
+    var balls = [];
+    //设置粒子半径
+    var R = canvas.height/20-1;
+    (function(){
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        //存储时间数字，由十位小时、个位小时、冒号、十位分钟、个位分钟、冒号、十位秒钟、个位秒钟这7个数字组成
+        data.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+    })();
+
+    /*生成点阵数字*/
+    function renderDigit(index,num){
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    cxt.beginPath();
+                    cxt.arc(14*(R+2)*index + j*2*(R+1)+(R+1),i*2*(R+1)+(R+1),R,0,2*Math.PI);
+                    cxt.closePath();
+                    cxt.fill();
+                }
+            }
+        }
+    }
+
+    /*更新时钟*/
+    function updateDigitTime(){
+        var changeNumArray = [];
+        var temp = /(\d)(\d):(\d)(\d):(\d)(\d)/.exec(new Date());
+        var NewData = [];
+        NewData.push(temp[1],temp[2],10,temp[3],temp[4],10,temp[5],temp[6]);
+        for(var i = data.length-1; i >=0 ; i--){
+            //时间发生变化
+            if(NewData[i] !== data[i]){
+                //将变化的数字值和在data数组中的索引存储在changeNumArray数组中
+                changeNumArray.push(i+'_'+(Number(data[i])+1)%10);
+            }
+        }
+        //增加小球
+        for(var i = 0; i< changeNumArray.length; i++){
+            addBalls.apply(this,changeNumArray[i].split('_'));
+        }
+        data = NewData.concat();
+    }
+
+    /*更新小球状态*/
+    function updateBalls(){
+        for(var i = 0; i < balls.length; i++){
+            balls[i].stepY += balls[i].disY;
+            balls[i].x += balls[i].stepX;
+            balls[i].y += balls[i].stepY;
+            if(balls[i].x > W + R || balls[i].y > H + R){
+                balls.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    /*增加要运动的小球*/
+    function addBalls(index,num){
+        var numArray = [1,2,3];
+        var colorArray =  ["#3BE","#09C","#A6C","#93C","#9C0","#690","#FB3","#F80","#F44","#C00"];
+        for(var i = 0; i < digit[num].length; i++){
+            for(var j = 0; j < digit[num][i].length; j++){
+                if(digit[num][i][j] == 1){
+                    var ball = {
+                        x:14*(R+2)*index + j*2*(R+1)+(R+1),
+                        y:i*2*(R+1)+(R+1),
+                        stepX:Math.floor(Math.random() * 4 -2),
+                        stepY:-2*numArray[Math.floor(Math.random()*numArray.length)],
+                        color:colorArray[Math.floor(Math.random()*colorArray.length)],
+                        disY:1
+                    };
+                    balls.push(ball);
+                }
+            }
+        }
+    }
+
+    /*渲染*/
+    function render(){
+        //重置画布宽度，达到清空画布的效果
+        canvas.height = 100;
+        //渲染时钟
+        for(var i = 0; i < data.length; i++){
+            renderDigit(i,data[i]);
+        }
+        //渲染小球
+        for(var i = 0; i < balls.length; i++){
+            cxt.beginPath();
+            cxt.arc(balls[i].x,balls[i].y,R,0,2*Math.PI);
+            cxt.fillStyle = balls[i].color;
+            cxt.closePath();
+            cxt.fill();
+        }
+    }
+
+    clearInterval(oTimer);
+    var oTimer = setInterval(function(){
+        //更新时钟
+        updateDigitTime();
+        //更新小球状态
+        updateBalls();
+        //渲染
+        render();
+    },50);
+}
+
+})();
+</script>
+
+
+	 
+    </div>	  
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yue Yuan</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.0.1</div>
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'vUbfXc0NyB0Tq2zzexRrkhwA-gzGzoHsz',
+    appKey: 'H241f9g1EjlUcNcJcJogpuak',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+    <script>
+  window.livereOptions = {
+    refer: 'posts/86fca59a.html'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+        .fail(function ({ responseJSON }) {
+          console.log('LeanCloud Counter Error: ' + responseJSON.code + ' ' + responseJSON.error);
+        });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + 'vUbfXc0NyB0Tq2zzexRrkhwA-gzGzoHsz')
+        .done(function({ api_server }) {
+          var Counter = function(method, url, data) {
+            return $.ajax({
+              method: method,
+              url: 'https://' + api_server + '/1.1' + url,
+              headers: {
+                'X-LC-Id': 'vUbfXc0NyB0Tq2zzexRrkhwA-gzGzoHsz',
+                'X-LC-Key': 'H241f9g1EjlUcNcJcJogpuak',
+                'Content-Type': 'application/json',
+              },
+              data: data
+            });
+          };
+          
+            addCount(Counter);
+          
+        });
+    });
+  </script>
+
+
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<script type="text/javascript" src="/js/src/hone_hone_clock.js"></script>
