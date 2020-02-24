@@ -1444,12 +1444,14 @@ pre .javascript .function {
   overflow-wrap: break-word;
   word-wrap: break-word;
   text-align: center;
-  font-weight: 400;
+  color: #eb6d39;
+  font-weight: bold;
 }
 .posts-expand .post-title-link {
   display: inline-block;
   position: relative;
-  color: #555;
+  color: #eb6d39;
+  font-weight: bold;
   border-bottom: none;
   line-height: 1.2;
   vertical-align: top;
@@ -1586,9 +1588,9 @@ pre .javascript .function {
 }
 .posts-expand .post-eof {
   display: block;
-  margin: 80px auto 60px;
-  width: 8%;
-  height: 1px;
+  margin: 0px auto 0px;
+  width: 0%;
+  height: 0px;
   background: #ccc;
   text-align: center;
 }
@@ -1891,7 +1893,7 @@ img:hover {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #66fa03;
+  background: #4dffc2;
 }
 .feed-link,
 .chat {
@@ -2545,7 +2547,7 @@ ul.breadcrumb li+li:last-child {
   float: right;
   box-sizing: border-box;
   padding: 40px;
-  width: calc(100% - 252px);
+  width: calc(100% - 250px);
   background: #fff;
   min-height: 700px;
   box-shadow: initial;
@@ -2784,7 +2786,7 @@ ul.breadcrumb li+li:last-child {
 }
 .sidebar-inner.affix {
   position: fixed;
-  top: 12px;
+  top: 10px;
 }
 .sidebar-inner.affix-bottom {
   position: absolute;
